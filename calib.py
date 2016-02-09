@@ -20,26 +20,41 @@ def nothing():
 
 def createStereoPair(id1, id2):
     try:
-        return cv2.VideoCapture(id1), cv2.VideoCapture(id2)
+        return (cv2.VideoCapture(id1), cv2.VideoCapture(id2))
     except:
         print traceback.format_exc()
-        return None, None
+        return (None, None)
 
-def captureFromStereo(cam1, cam2):
-    _, frame1 = cam1.read()
-    _, frame2 = cam2.read()
-    return frame1, frame2
+def captureFromStereo(cam):
+    _, frame1 = cam[0].read()
+    _, frame2 = cam[1].read()
+    return [frame1, frame2]
 
-def cameraSideSwap(frame1, frame2, swap):
-    return (swap and np.concatenate((frame2, frame1), axis=1) or np.concatenate((frame1, frame2), axis=1))
+def combineStereoFrames(frames, swap=False):
+    return np.concatenate((frames[1], frames[0]), axis=1) if swap else np.concatenate((frames[0], frames[1]), axis=1)
 
-def releaseStereoPair(cam1, cam2):
-    cam1.release()
-    cam2.release()
+def releaseStereoPair(cam):
+    cam[0].release()
+    cam[1].release()
 
 def createChessboard(gridSize, squareSize):
-    objectPoints = np.zeros((gridSize[0]*gridSize[1],3), np.float32)
-    objectPoints[:,:2] = np.mgrid[0:gridSize[0],0:gridSize[1]].T.reshape(-1,2) * squareSize
-    return objectPoints
+    iObjPoints = np.zeros((gridSize[0]*gridSize[1], 3), np.float32)
+    iObjPoints[:, :2] = np.mgrid[0:gridSize[0], 0:gridSize[1]].T.reshape(-1, 2) * squareSize
+    return iObjPoints
 
-def
+def findChessboardCorners(frames, gridSize, iObjPoints, objPoints, imgPoints, draw=True):
+    gray1, gray2 = cv2.cvtColor(frames[0], cv2.COLOR_BGR2GRAY), cv2.cvtColor(frames[1], cv2.COLOR_BGR2GRAY)
+    ret1, corners1 = cv2.findChessboardCorners(gray1, gridSize)
+    ret2, corners2 = cv2.findChessboardCorners(gray2, gridSize)
+#    print ret1, ret2
+    if ret1 and ret2 is True:
+        objPoints.append(iObjPoints)
+        cv2.cornerSubPix(gray1, corners1, (11,11), (-1,-1), CRITERIA)
+        cv2.cornerSubPix(gray2, corners2, (11,11), (-1,-1), CRITERIA)
+        imgPoints[0].append(corners1)
+        imgPoints[1].append(corners2)
+        if draw:
+            cv2.drawChessboardCorners(frames[0], gridSize, corners1, ret1)
+            cv2.drawChessboardCorners(frames[1], gridSize, corners2, ret2)
+
+    return frames, objPoints, imgPoints
