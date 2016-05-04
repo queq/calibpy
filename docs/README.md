@@ -7,4 +7,3 @@ Cambios adicionales que se deben hacer a los .tex exportados (lista en progreso)
 \date{}
 ```
 * Arreglar los captions para que muestren "Figura #:"
-*
