@@ -14,6 +14,8 @@ import cv2.cv as cv
 import numpy as np
 
 CRITERIA = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+FRAME_INTERVAL = 3
+MAX_FRAMES = 10
 
 def nothing():
     pass
@@ -42,19 +44,22 @@ def createChessboard(gridSize, squareSize):
     iObjPoints[:, :2] = np.mgrid[0:gridSize[0], 0:gridSize[1]].T.reshape(-1, 2) * squareSize
     return iObjPoints
 
-def findChessboardCorners(frames, gridSize, iObjPoints, objPoints, imgPoints, draw=True):
+def findChessboardCorners(frames, nChessFrames, gridSize, iObjPoints, objPoints, imgPoints, append=False, draw=True):
     gray1, gray2 = cv2.cvtColor(frames[0], cv2.COLOR_BGR2GRAY), cv2.cvtColor(frames[1], cv2.COLOR_BGR2GRAY)
     ret1, corners1 = cv2.findChessboardCorners(gray1, gridSize)
     ret2, corners2 = cv2.findChessboardCorners(gray2, gridSize)
 #    print ret1, ret2
     if ret1 and ret2 is True:
-        objPoints.append(iObjPoints)
         cv2.cornerSubPix(gray1, corners1, (11,11), (-1,-1), CRITERIA)
         cv2.cornerSubPix(gray2, corners2, (11,11), (-1,-1), CRITERIA)
-        imgPoints[0].append(corners1)
-        imgPoints[1].append(corners2)
-        if draw:
+        if append is True:
+            print "Frame {} appended".format(nChessFrames)
+            objPoints.append(iObjPoints)
+            imgPoints[0].append(corners1)
+            imgPoints[1].append(corners2)
+            nChessFrames += 1
+        if draw is True:
             cv2.drawChessboardCorners(frames[0], gridSize, corners1, ret1)
             cv2.drawChessboardCorners(frames[1], gridSize, corners2, ret2)
 
-    return frames, objPoints, imgPoints
+    return frames, nChessFrames, objPoints, imgPoints
