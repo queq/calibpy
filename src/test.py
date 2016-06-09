@@ -23,6 +23,8 @@ import cv2
 cap = cv2.VideoCapture(1)
 cap2 = cv2.VideoCapture(2)
 
+i = 1
+
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -32,10 +34,14 @@ while(True):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-    stereo = np.concatenate((gray,gray2), axis=1)
+    stereo = np.concatenate((frame,frame2), axis=1)
 
     # Display the resulting frame
     cv2.imshow('frame', stereo)
+    if cv2.waitKey(1) & 0xFF == ord('s'):
+        cv2.imwrite('left{}.png'.format(i), frame)
+        cv2.imwrite('right{}.png'.format(i), frame2)
+        i += 1
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
