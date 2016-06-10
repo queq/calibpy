@@ -9,7 +9,7 @@ images = imageSet(imageDir);
 
 frameLeft = read(images, 1);
 frameRight = read(images, 2);
-
+    
 [frameLeftRect, frameRightRect] = ...
     rectifyStereoImages(frameLeft, frameRight, stereoParams);
 
