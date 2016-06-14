@@ -19,8 +19,6 @@
 import numpy as np
 import cv2
 
-FPS = cv2.cv.CV_CAP_PROP_FPS
-
 cap = cv2.VideoCapture(1)
 cap2 = cv2.VideoCapture(2)
 
@@ -40,8 +38,9 @@ while(True):
     # Display the resulting frame
     cv2.imshow('Left', frame)
     cv2.imshow('Right', frame2)
-    # cv2.imshow('Frame', frame)
-    k = cv2.waitKey(33)
+    # cv2.imshow('Stereo', stereo)
+
+    k = cv2.waitKey(1)
     if k == 27:
         break
     elif k == ord('s'):
